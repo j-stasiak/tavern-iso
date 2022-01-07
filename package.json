@@ -7,7 +7,7 @@
     "prebuild": "rimraf dist",
     "build": "tsc --project .",
     "prestart": "npm run build",
-    "start": "node ./dist/src/index.js",
+    "start": "node ./dist/index.js",
     "start:dev": "nodemon src/index.ts"
   },
   "keywords": [],
