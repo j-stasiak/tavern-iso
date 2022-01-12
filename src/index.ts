@@ -16,9 +16,10 @@ grpcServer.bindAsync(
   (err, port) => {
     if (err) {
       console.error(err);
+      process.exit(1);
     }
 
-    console.log(`Listening on port *:${port}`);
     grpcServer.start();
+    console.log(`Listening on port *:${port}`);
   }
 );
