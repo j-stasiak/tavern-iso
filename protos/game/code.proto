@@ -1,0 +1,19 @@
+syntax = "proto3";
+import "google/protobuf/struct.proto";
+
+package code;
+
+service Code {
+  rpc ExecuteCode (CodeRequest) returns (ExecutionResponse);
+}
+
+message CodeRequest {
+  string userId = 1;
+  string code = 2;
+  google.protobuf.Struct gameObject = 3;
+}
+
+message ExecutionResponse {
+  string userId = 1;
+  google.protobuf.Struct gameObject = 2;
+}

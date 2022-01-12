@@ -1,6 +1,4 @@
 *
-!scripts/
-!protos/
 !src/
 !tsconfig.json
 !tsconfig.build.json

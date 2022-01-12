@@ -1,37 +1,24 @@
-import ivm from "isolated-vm";
-import express, { Request, Response } from "express";
-import path from "path";
-import http from "http";
-import { Server } from "socket.io";
+import dotenv from "dotenv";
+dotenv.config();
+import * as grpc from "@grpc/grpc-js";
+import { CodeService } from "./proto/game/code_grpc_pb";
+import { CodeServer } from "./CodeServer";
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const PORT = process.env.PORT || "4001";
 
-app.get("/", (req: Request, res: Response) => {
-  res.sendFile(path.resolve() + "/src/index.html");
-});
+const grpcServer = new grpc.Server();
+// @ts-ignore
+grpcServer.addService(CodeService, new CodeServer());
 
-io.on("connection", (socket) => {
-  console.log("a user connected");
-  socket.on("script", (code) => {
-    const isolate = new ivm.Isolate({ memoryLimit: 16 });
-    const context = isolate.createContextSync();
-    const jail = context.global;
+grpcServer.bindAsync(
+  `0.0.0.0:${PORT}`,
+  grpc.ServerCredentials.createInsecure(),
+  (err, port) => {
+    if (err) {
+      console.error(err);
+    }
 
-    jail.setSync("global", jail.derefInto());
-    jail.setSync(
-      "user",
-      new ivm.ExternalCopy({ roles: ["hackerman", "admin"] }).copyInto()
-    );
-    jail.setSync("log", function (...args: any[]) {
-      console.log(...args);
-    });
-
-    context.evalSync(code);
-  });
-});
-
-server.listen(3000, () => {
-  console.log("listening on *:3000");
-});
+    console.log(`Listening on port *:${port}`);
+    grpcServer.start();
+  }
+);
